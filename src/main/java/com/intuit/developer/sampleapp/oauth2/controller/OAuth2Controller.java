@@ -6,6 +6,9 @@ import java.util.UUID;
 
 import javax.servlet.http.HttpSession;
 
+import com.github.scribejava.apis.VkontakteApi;
+import com.github.scribejava.core.builder.ServiceBuilder;
+import com.github.scribejava.core.oauth.OAuth20Service;
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
@@ -25,7 +28,17 @@ import com.intuit.developer.sampleapp.oauth2.service.ValidationService;
 public class OAuth2Controller {
 	
 	private static final Logger logger = Logger.getLogger(OAuth2Controller.class);
-	
+	private static final String clientId = "7651720";
+	private static final String clientSecret = "jKh2Mp5PcUwJbkSmxq2Q";
+	private static final OAuth20Service service = new ServiceBuilder(clientId)
+			.apiSecret(clientSecret)
+			.defaultScope("wall,offline") // replace with desired scope
+			.callback("http://localhost:8080/callback")
+			.build(VkontakteApi.instance());
+	private static final String customScope = "wall,offline,email";
+	private static final String authorizationUrl = service.createAuthorizationUrlBuilder().scope(customScope).build();
+
+
 	@Autowired
     public OAuth2Configuration oAuth2Configuration;
 	
@@ -56,45 +69,8 @@ public class OAuth2Controller {
 		logger.info("inside vk ");
 		return new RedirectView(prepareUrl(oAuth2Configuration.getC2QBScope(), generateCSRFToken(session)), true, true, false);
 	}
-
-	/**
-	 * Controller mapping for connectToQuickbooks button
-	 * @return
-	 */
-	@RequestMapping("/connectToQuickbooks")
-	public View connectToQuickbooks(HttpSession session) {
-		logger.info("inside connectToQuickbooks ");
-		return new RedirectView(prepareUrl(oAuth2Configuration.getC2QBScope(), generateCSRFToken(session)), true, true, false);
-	}
-	
-	/**
-	 * Controller mapping for signInWithIntuit button
-	 * @return
-	 */
-	@RequestMapping("/signInWithIntuit")
-	public View signInWithIntuit(HttpSession session) {
-		logger.info("inside signInWithIntuit ");
-		return new RedirectView(prepareUrl(oAuth2Configuration.getSIWIScope(), generateCSRFToken(session)), true, true, false);
-	}
-	
-	/**
-	 * Controller mapping for getAppNow button
-	 * @return
-	 */
-	@RequestMapping("/getAppNow")
-	public View getAppNow(HttpSession session) {
-		logger.info("inside getAppNow "  );
-		return new RedirectView(prepareUrl(oAuth2Configuration.getAppNowScope(), generateCSRFToken(session)), true, true, false);
-	}
-	
 	private String prepareUrl(String scope, String csrfToken)  {
-		return "https://oauth.vk.com/authorize?v=5.92&response_type=code&client_id=7651720&redirect_uri=http%3A%2F%2Flocalhost%3A8080%2Fcallback&scope=wall%2Coffline%2Cemail";
-	}
-	
-	private String generateCSRFToken(HttpSession session)  {
-		String csrfToken = UUID.randomUUID().toString();
-		session.setAttribute("csrfToken", csrfToken);
-		return csrfToken;
+		return authorizationUrl;
 	}
 
 }
