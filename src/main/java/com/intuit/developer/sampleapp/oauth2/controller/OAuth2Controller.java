@@ -44,7 +44,19 @@ public class OAuth2Controller {
 	public String connected() {
 		return "connected";
 	}
-	
+
+	@RequestMapping("/connectToVK")
+	public View connectToVK(HttpSession session) {
+		logger.info("inside vk ");
+		return new RedirectView(prepareUrl(oAuth2Configuration.getC2QBScope(), generateCSRFToken(session)), true, true, false);
+	}
+
+	@RequestMapping("/signInWithVK")
+	public View signInWithVK(HttpSession session) {
+		logger.info("inside vk ");
+		return new RedirectView(prepareUrl(oAuth2Configuration.getC2QBScope(), generateCSRFToken(session)), true, true, false);
+	}
+
 	/**
 	 * Controller mapping for connectToQuickbooks button
 	 * @return
@@ -76,16 +88,7 @@ public class OAuth2Controller {
 	}
 	
 	private String prepareUrl(String scope, String csrfToken)  {
-		try {
-			return oAuth2Configuration.getIntuitAuthorizationEndpoint() 
-					+ "?client_id=" + oAuth2Configuration.getAppClientId() 
-					+ "&response_type=code&scope=" + URLEncoder.encode(scope, "UTF-8") 
-					+ "&redirect_uri=" + URLEncoder.encode(oAuth2Configuration.getAppRedirectUri(), "UTF-8") 
-					+ "&state=" + csrfToken;
-		} catch (UnsupportedEncodingException e) {
-			logger.error("Exception while preparing url for redirect ", e);
-		}
-		return null;
+		return "https://oauth.vk.com/authorize?v=5.92&response_type=code&client_id=7651720&redirect_uri=http%3A%2F%2Flocalhost%3A8080%2Fcallback&scope=wall%2Coffline%2Cemail";
 	}
 	
 	private String generateCSRFToken(HttpSession session)  {

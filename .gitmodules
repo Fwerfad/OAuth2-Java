@@ -1,0 +1,3 @@
+[submodule "scribejava"]
+	path = scribejava
+	url = https://github.com/scribejava/scribejava

@@ -1,0 +1,22 @@
+<component name="libraryTable">
+  <library name="scribejava">
+    <CLASSES />
+    <JAVADOC />
+    <SOURCES>
+      <root url="file://$PROJECT_DIR$/scribejava/scribejava-apis/src/main/java" />
+      <root url="file://$PROJECT_DIR$/scribejava/scribejava-apis/src/test/java" />
+      <root url="file://$PROJECT_DIR$/scribejava/scribejava-core/src/main/java" />
+      <root url="file://$PROJECT_DIR$/scribejava/scribejava-core/src/test/java" />
+      <root url="file://$PROJECT_DIR$/scribejava/scribejava-httpclient-ahc/src/main/java" />
+      <root url="file://$PROJECT_DIR$/scribejava/scribejava-httpclient-ahc/src/test/java" />
+      <root url="file://$PROJECT_DIR$/scribejava/scribejava-httpclient-apache/src/main/java" />
+      <root url="file://$PROJECT_DIR$/scribejava/scribejava-httpclient-apache/src/test/java" />
+      <root url="file://$PROJECT_DIR$/scribejava/scribejava-httpclient-armeria/src/main/java" />
+      <root url="file://$PROJECT_DIR$/scribejava/scribejava-httpclient-armeria/src/test/java" />
+      <root url="file://$PROJECT_DIR$/scribejava/scribejava-httpclient-ning/src/main/java" />
+      <root url="file://$PROJECT_DIR$/scribejava/scribejava-httpclient-ning/src/test/java" />
+      <root url="file://$PROJECT_DIR$/scribejava/scribejava-httpclient-okhttp/src/main/java" />
+      <root url="file://$PROJECT_DIR$/scribejava/scribejava-httpclient-okhttp/src/test/java" />
+    </SOURCES>
+  </library>
+</component>

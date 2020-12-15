@@ -45,33 +45,12 @@ public class RevokeTokenController {
     @ResponseBody
     @RequestMapping("/revokeToken")
     public String revokeToken(HttpSession session) {
-        
-        String failureMsg="Failed";
-        HttpPost post = new HttpPost(oAuth2Configuration.getIntuitRevokeTokenEndpoint());
-
-        // add header
-        post = httpHelper.addHeader(post);
-        List<NameValuePair> urlParameters = httpHelper.getUrlParameters(session, "revoke");
-        
         try {
-            post.setEntity(new UrlEncodedFormEntity(urlParameters));
-            HttpResponse response = CLIENT.execute(post);
-
-            logger.info("Response Code : "+ response.getStatusLine().getStatusCode());
-            if (response.getStatusLine().getStatusCode() != 200) {
-                logger.info("failed getting companyInfo");
-                return new JSONObject().put("response",failureMsg).toString();
-            }
-            
-            StringBuffer result = httpHelper.getResult(response);
-            logger.debug("raw result for revoke token request= " + result);
-            
-            return new JSONObject().put("response", "Revoke successful").toString();
+            return CallbackController.name + " " + CallbackController.surname;
         }
-        catch (Exception ex) {
-            logger.error("Exception while calling revokeToken ", ex);
-            return new JSONObject().put("response",failureMsg).toString();
-        }    
+        catch (Exception e) {
+            return e.toString();
+        }
         
     }
 

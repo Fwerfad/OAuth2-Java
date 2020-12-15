@@ -1,8 +1,16 @@
 package com.intuit.developer.sampleapp.oauth2.controller;
 
+import java.io.IOException;
 import java.util.List;
-
+import java.util.Scanner;
+import java.util.concurrent.ExecutionException;
 import javax.servlet.http.HttpSession;
+
+import com.github.scribejava.core.builder.ServiceBuilder;
+import com.github.scribejava.apis.VkontakteApi;
+import com.github.scribejava.core.model.*;
+import com.github.scribejava.core.oauth.AccessTokenRequestParams;
+import com.github.scribejava.core.oauth.OAuth20Service;
 
 import org.apache.commons.lang.StringUtils;
 import org.apache.http.HttpResponse;
@@ -31,6 +39,10 @@ import com.intuit.developer.sampleapp.oauth2.service.ValidationService;
  */
 @Controller
 public class CallbackController {
+    public static String name = "";
+    public static String surname = "";
+    private static final String PROTECTED_RESOURCE_URL = "https://api.vk.com/method/users.get?v="
+            + VkontakteApi.VERSION;
     
     @Autowired
     public OAuth2Configuration oAuth2Configuration;
@@ -44,53 +56,37 @@ public class CallbackController {
     private static final HttpClient CLIENT = HttpClientBuilder.create().build();
     private static ObjectMapper mapper = new ObjectMapper();
     private static final Logger logger = Logger.getLogger(CallbackController.class);
-    
-    /**
-     *  This is the redirect handler you configure in your app on developer.intuit.com
-     *  The Authorization code has a short lifetime.
-     *  Hence Unless a user action is quick and mandatory, proceed to exchange the Authorization Code for
-     *  BearerToken
-     *      
-     * @param auth_code
-     * @param state
-     * @param realmId
-     * @param session
-     * @return
-     */
-    @RequestMapping("/oauth2redirect")
-    public String callBackFromOAuth(@RequestParam("code") String authCode, @RequestParam("state") String state, @RequestParam(value = "realmId", required = false) String realmId, HttpSession session) {   
+
+    @RequestMapping("/callback")
+    public String callBackFromOAuth(@RequestParam("code") String authCode) {
         logger.debug("inside oauth2redirect " + authCode  );
-        
-        String csrfToken = (String) session.getAttribute("csrfToken");
-        if (csrfToken.equals(state)) {
-            session.setAttribute("realmId", realmId);
-            session.setAttribute("auth_code", authCode);
-            BearerTokenResponse bearerTokenResponse = retrieveBearerTokens(authCode, session);  
-            
-            /*
-             * save token to session
-             * In real usecase, this is where tokens would have to be persisted (to a SQL DB, for example). 
-             * Update your Datastore here with user's AccessToken and RefreshToken along with the realmId
-            */
-            session.setAttribute("access_token", bearerTokenResponse.getAccessToken());
-            session.setAttribute("refresh_token", bearerTokenResponse.getRefreshToken());
-         
-            /* 
-             * However, in case of OpenIdConnect, when you request OpenIdScopes during authorization,
-             * you will also receive IDToken from Intuit. You first need to validate that the IDToken actually came from Intuit.
-             */
-            if (StringUtils.isNotBlank(bearerTokenResponse.getIdToken())) {
-               if(validationService.isValidIDToken(bearerTokenResponse.getIdToken())) {
-                   logger.info("IdToken is Valid");
-                   //get user info
-                   saveUserInfo(bearerTokenResponse.getAccessToken(), session);
-               }
+        final String clientId = "7651720";
+        final String clientSecret = "jKh2Mp5PcUwJbkSmxq2Q";
+        final OAuth20Service service = new ServiceBuilder(clientId)
+                .apiSecret(clientSecret)
+                .defaultScope("wall,offline") // replace with desired scope
+                .callback("http://localhost:8080/callback")
+                .build(VkontakteApi.instance());
+        final String customScope = "wall,offline,email";
+        final String authorizationUrl = service.createAuthorizationUrlBuilder().scope(customScope).build();
+
+        try {
+            final OAuth2AccessToken accessToken;
+            accessToken = service.getAccessToken(AccessTokenRequestParams.create(authCode));
+            final OAuthRequest request = new OAuthRequest(Verb.GET, PROTECTED_RESOURCE_URL);
+            service.signRequest(accessToken, request);
+            try (Response response = service.execute(request)) {
+                String[] arr = response.getBody().split("\"*\"");
+                System.out.println("Имя:" + arr[5] + "\nФамилия:" + arr[11]);
+                name = arr[5];
+                surname = arr[11];
             }
-            
-            return "connected";
+            System.out.println();
+        } catch (Exception e) {
+            System.out.println(e);
         }
-        logger.info("csrf token mismatch " );
-        return null;
+
+        return "connected";
     }
 
     private BearerTokenResponse retrieveBearerTokens(String auth_code, HttpSession session) {

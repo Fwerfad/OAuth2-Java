@@ -2,6 +2,7 @@
 buildscript {
     repositories {
         mavenCentral()
+        maven {url "https://github.com/scribejava/scribejava"}
     }
     dependencies {
         classpath("org.springframework.boot:spring-boot-gradle-plugin:2.1.0.RELEASE")
@@ -40,8 +41,11 @@ dependencies {
     compile("log4j:log4j:1.2.17")
     compile (group: 'ant', name: 'ant', version: '1.7.0')
     compile group: 'org.json', name: 'json', version: '20180813'
+    compile group: 'com.github.scribejava', name: 'scribejava-core', version: '7.1.1'
+    compile group: 'com.github.scribejava', name: 'scribejava-apis', version: '7.1.1'
+
     testCompile('org.springframework.boot:spring-boot-starter-test')
-  
+
 }
 
 wrapper {
