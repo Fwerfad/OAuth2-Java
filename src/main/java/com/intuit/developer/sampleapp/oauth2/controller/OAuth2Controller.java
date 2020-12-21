@@ -25,8 +25,8 @@ public class OAuth2Controller {
 	public static final String authorizationUrl = service.createAuthorizationUrlBuilder().scope(customScope).build();
 	    
 	@RequestMapping("/")
-	public String home() {
-		return "home";
+	public String index() {
+		return "index";
 	}
 
 	@RequestMapping("/signInWithVK")
